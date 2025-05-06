@@ -1,5 +1,6 @@
 import { cn } from "../lib/utils";
-import { DotPattern } from "./magicui/dot-pattern";
+import { ColourText } from "./ColourText";
+import { DotPattern } from "./ui/dot-pattern";
 
 export function DotBackground() {
   return (
@@ -10,6 +11,9 @@ export function DotBackground() {
           "[mask-image:radial-gradient(100vh_circle_at_center,white,transparent)] text-white",
         )}
       />
+      <div>
+        <ColourText />
+      </div>
     </div>
   );
 }
