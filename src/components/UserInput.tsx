@@ -2,7 +2,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -20,17 +19,36 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { BookUser, Briefcase, Github, ImageIcon, Linkedin, Mail, PhoneCall, Save, Text, User } from "lucide-react";
+import {
+  User,
+  Linkedin,
+  Github,
+  BookUser,
+  Save,
+  Briefcase,
+  Text,
+  Twitter,
+} from "lucide-react";
 import { useState } from "react";
 import { Textarea } from "./ui/textarea";
+
 
 const profileSchema = z.object({
   name: z.string().min(2).max(50),
   title: z.string().min(1).max(50),
-  email: z.string().email("Invalid email address").min(1, "Email is required"),
   // imageUrl: z.string().url("Invalid URL, ensure it includes http(s)://").optional().or(z.literal("")),
-  linkedinUrl: z.string().url("Invalid URL, ensure it includes http(s)://").optional().or(z.literal("")),
-  githubUrl: z.string().url("Invalid URL, ensure it includes http(s)://").optional().or(z.literal("")),
+  linkedinUrl: z
+    .string()
+    .url("Invalid URL, ensure it includes http(s)://")
+    .or(z.literal("")),
+  githubUrl: z
+    .string()
+    .url("Invalid URL, ensure it includes http(s)://")
+    .or(z.literal("")),
+  twitterUrl: z
+    .string()
+    .url("Invalid URL, ensure it includes http(s)://")
+    .or(z.literal("")),
   bio: z.string().max(500, "Bio should not exceed 500 characters").optional(),
 });
 type Profile = z.infer<typeof profileSchema>;
@@ -68,7 +86,7 @@ const UserInput = () => {
     defaultValues: {
       name: "",
       title: "",
-      email: "",
+      twitterUrl: "",
       // imageUrl: "",
       linkedinUrl: "",
       githubUrl: "",
@@ -111,10 +129,81 @@ const UserInput = () => {
     },
   });
 
-  function onProfileSubmit(values: Profile) {
+  const onProfileSubmit = (values: Profile) => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
+  };
+
+  const onAddSkill = (values: Skill) => {
+    // console.log(values);
+    setskillList([...skillList, values]);
+    console.log("Current Skills List:", skillList);
+    skillForm.reset(); // Reset the skill input after adding
+  };
+
+  const onRemoveSkill = (values: Skill) => {
+    // console.log(values);
+    setskillList(skillList.filter((skill) => skill !== values));
+  };
+
+  const saveSkillsList = () => {
+    if (skillList.length === 0) {
+      console.warn("No skills to save.");
+      return;
+    }
+    // Here you can handle the saving logic, e.g., send to an API or store in local state
+    console.log("Skills saved:", skillList);
+  }
+
+  const onAddProject = (values: Project) => {
+    const generateId = () => Math.random().toString(36).substr(2, 9);
+    // Ensure the project has a unique ID
+    if (!values.id) {
+      values.id = generateId();
+    }
+    console.log(values);
+    setProjectList([...projectList, values]);
+    projectForm.reset();
+    console.log("Current Projects List:", projectList);
+  }
+
+  const onRemoveProject = (id: string) => {
+    setProjectList(projectList.filter((project) => project.id !== id));
+  };
+
+  const saveProjectsList = () => {
+    if (projectList.length === 0) {
+      console.warn("No projects to save.");
+      return;
+    }
+    // Here you can handle the saving logic, e.g., send to an API or store in local state
+    console.log("Projects saved:", projectList);
+  }
+
+  const onAddExperience = () => {
+    const values = experienceForm.getValues();
+    // Ensure the experience has a unique ID
+    if (!values.id) {
+      values.id = crypto.randomUUID();
+    }
+    console.log(values);
+    setExperienceList([...experienceList, values]);
+    experienceForm.reset();
+    console.log("Current Experience List:", experienceList);
+  }
+
+  const onRemoveExperience = (id: string) => {
+    setExperienceList(experienceList.filter((exp) => exp.id !== id));
+  };
+
+  const saveExperienceList = () => {
+    if (experienceList.length === 0) {
+      console.warn("No experience to save.");
+      return;
+    }
+    // Here you can handle the saving logic, e.g., send to an API or store in local state
+    console.log("Experience saved:", experienceList);
   }
 
   return (
@@ -124,21 +213,28 @@ const UserInput = () => {
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center text-2xl">
-              <BookUser className="mr-3 h-7 w-7 text-primary" /> Personal Profile
+              <BookUser className="mr-3 h-7 w-7 text-primary" /> Personal
+              Profile
             </CardTitle>
             <CardDescription>Tell us about yourself.</CardDescription>
           </CardHeader>
 
           <CardContent>
             <Form {...profileForm}>
-              <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
+              <form
+                onSubmit={profileForm.handleSubmit(onProfileSubmit)}
+                className="space-y-6"
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={profileForm.control}
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center"><User className="mr-2 h-4 w-4" />Name</FormLabel>
+                        <FormLabel className="flex items-center">
+                          <User className="mr-2 h-4 w-4" />
+                          Name
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="e.g., Jane Doe" {...field} />
                         </FormControl>
@@ -151,9 +247,15 @@ const UserInput = () => {
                     name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center"><Briefcase className="mr-2 h-4 w-4" />Title/Headline</FormLabel>
+                        <FormLabel className="flex items-center">
+                          <Briefcase className="mr-2 h-4 w-4" />
+                          Title/Headline
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., Software Engineer | Web Developer" {...field} />
+                          <Input
+                            placeholder="e.g., Software Engineer | Web Developer"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -163,12 +265,19 @@ const UserInput = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={profileForm.control}
-                    name="email"
+                    name="twitterUrl"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center"><Mail className="mr-2 h-4 w-4" />Email</FormLabel>
+                        <FormLabel className="flex items-center">
+                          <Twitter className="mr-2 h-4 w-4" />
+                          Twitter URL (Optional)
+                        </FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="e.g., jane.doe@example.com" {...field} />
+                          <Input
+                            type="url"
+                            placeholder="e.g., https://twitter.com/janedoe"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -189,14 +298,20 @@ const UserInput = () => {
                     )}
                   /> */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <FormField
+                  <FormField
                     control={profileForm.control}
                     name="linkedinUrl"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center"><Linkedin className="mr-2 h-4 w-4" />LinkedIn URL (Optional)</FormLabel>
+                        <FormLabel className="flex items-center">
+                          <Linkedin className="mr-2 h-4 w-4" />
+                          LinkedIn URL (Optional)
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., https://linkedin.com/in/janedoe" {...field} />
+                          <Input
+                            placeholder="e.g., https://linkedin.com/in/janedoe"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -207,9 +322,15 @@ const UserInput = () => {
                     name="githubUrl"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center"><Github className="mr-2 h-4 w-4" />GitHub URL (Optional)</FormLabel>
+                        <FormLabel className="flex items-center">
+                          <Github className="mr-2 h-4 w-4" />
+                          GitHub URL (Optional)
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., https://github.com/janedoe" {...field} />
+                          <Input
+                            placeholder="e.g., https://github.com/janedoe"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -221,9 +342,16 @@ const UserInput = () => {
                   name="bio"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center"><Text className="mr-2 h-4 w-4" />Short Bio (Optional)</FormLabel>
+                      <FormLabel className="flex items-center">
+                        <Text className="mr-2 h-4 w-4" />
+                        Short Bio (Optional)
+                      </FormLabel>
                       <FormControl>
-                        <Textarea placeholder="A brief introduction about yourself..." className="min-h-[100px]" {...field} />
+                        <Textarea
+                          placeholder="A brief introduction about yourself..."
+                          className="min-h-[100px]"
+                          {...field}
+                        />
                       </FormControl>
                       <FormDescription>Max 500 characters.</FormDescription>
                       <FormMessage />
@@ -239,46 +367,460 @@ const UserInput = () => {
         </Card>
 
         {/* skill section input */}
-        <Card>
+        {/* <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle>Card Title</CardTitle>
-            <CardDescription>Card Description</CardDescription>
+            <CardTitle className="flex items-center text-2xl">
+              <Cpu className="mr-3 h-7 w-7 text-primary" /> Skills
+            </CardTitle>
+            <CardDescription>
+              Add your technical and soft skills one by one.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <p>Card Content</p>
+            <Form {...skillForm}>
+              <form
+                onSubmit={skillForm.handleSubmit(onAddSkill)}
+                className="flex items-start gap-4 mb-4"
+              >
+                <FormField
+                  control={skillForm.control}
+                  name="skillName"
+                  render={({ field }) => (
+                    <FormItem className="flex-grow">
+                      <FormLabel className="sr-only">Skill Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., JavaScript" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" variant="outline">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Add Skill
+                </Button>
+              </form>
+            </Form>
+            {skillList.length > 0 && (
+              <div className="mb-6 space-y-2">
+                <h4 className="font-medium">Your Skills:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {skillList.map(({ skillName }, index) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="text-sm py-1 px-3"
+                    >
+                      {skillName}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="ml-2 h-4 w-4 p-0"
+                        onClick={() => onRemoveSkill(skillList[index])}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            <Button
+              onClick={saveSkillsList}
+              className="w-full md:w-auto"
+              disabled={skillList.length === 0}
+            >
+              <Save className="mr-2 h-4 w-4" /> Save All Skills
+            </Button>
           </CardContent>
-          <CardFooter>
-            <p>Card Footer</p>
-          </CardFooter>
-        </Card>
+        </Card> */}
 
         {/* project section input */}
-        <Card>
+        {/* <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle>Card Title</CardTitle>
-            <CardDescription>Card Description</CardDescription>
+            <CardTitle className="flex items-center text-2xl">
+              <FolderKanban className="mr-3 h-7 w-7 text-primary" /> Projects
+            </CardTitle>
+            <CardDescription>Add your significant projects.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p>Card Content</p>
+            <Form {...projectForm}>
+              <form
+                onSubmit={projectForm.handleSubmit(onAddProject)}
+                className="space-y-6 mb-6 border-b pb-6"
+              >
+                <FormField
+                  control={projectForm.control}
+                  name="projectTitle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center">
+                        <Layers className="mr-2 h-4 w-4" />
+                        Project Title
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g., Awesome Portfolio Website"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={projectForm.control}
+                  name="projectDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center">
+                        <Text className="mr-2 h-4 w-4" />
+                        Project Description
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Detailed description of your project, its features, and your role."
+                          className="min-h-[100px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={projectForm.control}
+                  name="projectImageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center">
+                        <ImageIcon className="mr-2 h-4 w-4" />
+                        Project Image URL (Optional)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g., https://example.com/project-image.png"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={projectForm.control}
+                  name="technologiesUsed"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center">
+                        <Cpu className="mr-2 h-4 w-4" />
+                        Technologies Used
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Comma-separated: React, Node.js, TailwindCSS"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={projectForm.control}
+                    name="liveUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center">
+                          <Globe className="mr-2 h-4 w-4" />
+                          Live URL (Optional)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., https://yourproject.com"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={projectForm.control}
+                    name="gitUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center">
+                          <GitBranch className="mr-2 h-4 w-4" />
+                          Git URL (Optional)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., https://github.com/your/project"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  variant="outline"
+                  className="w-full cursor-pointer md:w-auto"
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" /> Add Project
+                </Button>
+              </form>
+            </Form>
+
+            {projectList.length > 0 && (
+              <div className="space-y-4 mb-6">
+                <h4 className="text-lg font-semibold">Your Projects:</h4>
+                {projectList.map((project) => (
+                  <Card key={project.id} className="p-4 bg-muted/50">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h5 className="font-semibold text-primary">
+                          {project.projectTitle}
+                        </h5>
+                        <p className="text-sm text-muted-foreground mt-1 mb-2">
+                          {project.projectDescription}
+                        </p>
+                        {project.projectImageUrl && (
+                          <a
+                            href={project.projectImageUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary hover:underline block mb-1"
+                          >
+                            View Image
+                          </a>
+                        )}
+                        <p className="text-xs">
+                          <strong>Tech:</strong> {project.technologiesUsed}
+                        </p>
+                        {project.liveUrl && (
+                          <p className="text-xs">
+                            <strong>Live:</strong>{" "}
+                            <a
+                              href={project.liveUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline"
+                            >
+                              {project.liveUrl}
+                            </a>
+                          </p>
+                        )}
+                        {project.gitUrl && (
+                          <p className="text-xs">
+                            <strong>Git:</strong>{" "}
+                            <a
+                              href={project.gitUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline"
+                            >
+                              {project.gitUrl}
+                            </a>
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => onRemoveProject(project.id)}
+                        className="text-destructive bg-blue-300 hover:bg-blue-500 hover:text-destructive-foreground cursor-pointer"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+            <Button
+              onClick={saveProjectsList}
+              className="w-full md:w-auto"
+              disabled={projectList.length === 0}
+            >
+              <Save className="mr-2 h-4 w-4" /> Save All Projects
+            </Button>
           </CardContent>
-          <CardFooter>
-            <p>Card Footer</p>
-          </CardFooter>
-        </Card>
+        </Card> */}
 
         {/* experience section input */}
-        <Card>
+        {/* <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle>Card Title</CardTitle>
-            <CardDescription>Card Description</CardDescription>
+            <CardTitle className="flex items-center text-2xl">
+              <BriefcaseBusiness className="mr-3 h-7 w-7 text-primary" /> Work
+              Experience
+            </CardTitle>
+            <CardDescription>
+              Detail your professional journey by adding each role.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <p>Card Content</p>
+            <Form {...experienceForm}>
+              <form
+                onSubmit={experienceForm.handleSubmit(onAddExperience)}
+                className="space-y-6 mb-6 border-b pb-6"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={experienceForm.control}
+                    name="position"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center">
+                          <Briefcase className="mr-2 h-4 w-4" />
+                          Position/Job Title
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., Senior Software Developer"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={experienceForm.control}
+                    name="company"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center">
+                          <Building className="mr-2 h-4 w-4" />
+                          Company Name
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., Tech Solutions Inc."
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={experienceForm.control}
+                    name="startDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center">
+                          <CalendarDays className="mr-2 h-4 w-4" />
+                          Start Date
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., Jan 2020 or 01/2020"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={experienceForm.control}
+                    name="endDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center">
+                          <CalendarDays className="mr-2 h-4 w-4" />
+                          End Date (or "Present")
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., Dec 2022 or Present"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={experienceForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center">
+                        <Text className="mr-2 h-4 w-4" />
+                        Description/Responsibilities
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Describe your key responsibilities, achievements, and technologies used."
+                          className="min-h-[120px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="submit"
+                  variant="outline"
+                  className="w-full md:w-auto"
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" /> Add Experience
+                </Button>
+              </form>
+            </Form>
+
+            {experienceList.length > 0 && (
+              <div className="space-y-4 mb-6">
+                <h4 className="text-lg font-semibold">Your Experience:</h4>
+                {experienceList.map((exp) => (
+                  <Card key={exp.id} className="p-4 bg-muted/50">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h5 className="font-semibold text-primary">
+                          {exp.position}
+                        </h5>
+                        <p className="text-sm font-medium">{exp.company}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {exp.startDate} - {exp.endDate || "Present"}
+                        </p>
+                        <p className="text-sm mt-2 whitespace-pre-line">
+                          {exp.description}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onRemoveExperience(exp.id)}
+                        className="text-destructive hover:text-destructive-foreground hover:bg-destructive"
+                      >
+                        <X className="h-4 w-4" />
+                        <span className="sr-only">
+                          Remove {exp.position} at {exp.company}
+                        </span>
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+            <Button
+              onClick={saveExperienceList}
+              className="w-full md:w-auto"
+              disabled={experienceList.length === 0}
+            >
+              <Save className="mr-2 h-4 w-4" /> Save All Experience
+            </Button>
           </CardContent>
-          <CardFooter>
-            <p>Card Footer</p>
-          </CardFooter>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );

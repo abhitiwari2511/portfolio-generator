@@ -17,7 +17,6 @@ export const PortfolioProvider = ({
       description: "",
       avatar: "",
       location: "",
-      email: "",
       socials: [],
     },
     about: {

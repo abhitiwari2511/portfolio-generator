@@ -29,9 +29,8 @@ export interface PortfolioDetails {
     name: string;
     role: string;
     description: string;
-    avatar: string;
+    avatar?: string;
     location: string;
-    email: string;
     socials: Social[];
   };
   about: {
