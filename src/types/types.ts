@@ -36,7 +36,7 @@ export interface PortfolioDetails {
   about: {
     title: string;
     description: string;
-    resume: string;
+    // resume: string;
     // additionalInfo?: string;
   };
   projects: Project[];

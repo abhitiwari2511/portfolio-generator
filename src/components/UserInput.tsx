@@ -19,23 +19,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  User,
-  Linkedin,
-  Github,
-  BookUser,
-  Save,
-  Briefcase,
-  Text,
-  Twitter,
-} from "lucide-react";
+import { User, BookUser, Save, Briefcase, Text } from "lucide-react";
 import { useState } from "react";
 import { Textarea } from "./ui/textarea";
-
+import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { usePortfolio } from "@/hooks/usePortfolio";
+import { useNavigate } from "react-router-dom";
 
 const profileSchema = z.object({
   name: z.string().min(2).max(50),
-  title: z.string().min(1).max(50),
+  role: z.string().min(1).max(50),
   // imageUrl: z.string().url("Invalid URL, ensure it includes http(s)://").optional().or(z.literal("")),
   linkedinUrl: z
     .string()
@@ -49,7 +42,7 @@ const profileSchema = z.object({
     .string()
     .url("Invalid URL, ensure it includes http(s)://")
     .or(z.literal("")),
-  bio: z.string().max(500, "Bio should not exceed 500 characters").optional(),
+  bio: z.string().max(500, "Bio should not exceed 500 characters"),
 });
 type Profile = z.infer<typeof profileSchema>;
 
@@ -80,12 +73,14 @@ const experienceSchema = z.object({
 type Experience = z.infer<typeof experienceSchema>;
 
 const UserInput = () => {
+  const navigate = useNavigate();
+  const { portfolioConfig, updatePortfolioConfig } = usePortfolio();
 
   const profileForm = useForm<Profile>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: "",
-      title: "",
+      role: "",
       twitterUrl: "",
       // imageUrl: "",
       linkedinUrl: "",
@@ -130,9 +125,37 @@ const UserInput = () => {
   });
 
   const onProfileSubmit = (values: Profile) => {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    // console.log("Profile submitted:", values);
+
+    const socials = [
+      {
+        platform: "LinkedIn",
+        url: values.linkedinUrl || "",
+      },
+      {
+        platform: "GitHub",
+        url: values.githubUrl || "",
+      },
+      {
+        platform: "Twitter",
+        url: values.twitterUrl || "",
+      },
+    ];
+
+    updatePortfolioConfig({
+      personal: {
+        ...portfolioConfig.personal,
+        name: values.name,
+        role: values.role,
+        // imageUrl: values.imageUrl,
+        description: values.bio || "",
+        socials: socials,
+      },  
+    });
+
+    setTimeout(() => {
+      navigate('/hero');
+    }, 100);
   };
 
   const onAddSkill = (values: Skill) => {
@@ -154,7 +177,7 @@ const UserInput = () => {
     }
     // Here you can handle the saving logic, e.g., send to an API or store in local state
     console.log("Skills saved:", skillList);
-  }
+  };
 
   const onAddProject = (values: Project) => {
     const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -166,7 +189,7 @@ const UserInput = () => {
     setProjectList([...projectList, values]);
     projectForm.reset();
     console.log("Current Projects List:", projectList);
-  }
+  };
 
   const onRemoveProject = (id: string) => {
     setProjectList(projectList.filter((project) => project.id !== id));
@@ -179,7 +202,7 @@ const UserInput = () => {
     }
     // Here you can handle the saving logic, e.g., send to an API or store in local state
     console.log("Projects saved:", projectList);
-  }
+  };
 
   const onAddExperience = () => {
     const values = experienceForm.getValues();
@@ -191,7 +214,7 @@ const UserInput = () => {
     setExperienceList([...experienceList, values]);
     experienceForm.reset();
     console.log("Current Experience List:", experienceList);
-  }
+  };
 
   const onRemoveExperience = (id: string) => {
     setExperienceList(experienceList.filter((exp) => exp.id !== id));
@@ -204,7 +227,7 @@ const UserInput = () => {
     }
     // Here you can handle the saving logic, e.g., send to an API or store in local state
     console.log("Experience saved:", experienceList);
-  }
+  };
 
   return (
     <div>
@@ -244,7 +267,7 @@ const UserInput = () => {
                   />
                   <FormField
                     control={profileForm.control}
-                    name="title"
+                    name="role"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center">
@@ -269,8 +292,8 @@ const UserInput = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center">
-                          <Twitter className="mr-2 h-4 w-4" />
-                          Twitter URL (Optional)
+                          <FaXTwitter className="mr-2 h-4 w-4" />
+                          Twitter URL
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -289,7 +312,7 @@ const UserInput = () => {
                     name="imageUrl"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center"><ImageIcon className="mr-2 h-4 w-4" />Profile Image URL (Optional)</FormLabel>
+                        <FormLabel className="flex items-center"><ImageIcon className="mr-2 h-4 w-4" />Profile Image URL (Opnal)</FormLabel>
                         <FormControl>
                           <Input placeholder="e.g., https://example.com/your-image.jpg" {...field} />
                         </FormControl>
@@ -304,8 +327,8 @@ const UserInput = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center">
-                          <Linkedin className="mr-2 h-4 w-4" />
-                          LinkedIn URL (Optional)
+                          <FaLinkedin className="mr-2 h-4 w-4" />
+                          LinkedIn URL
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -323,8 +346,8 @@ const UserInput = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center">
-                          <Github className="mr-2 h-4 w-4" />
-                          GitHub URL (Optional)
+                          <FaGithub className="mr-2 h-4 w-4" />
+                          GitHub URL
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -344,7 +367,7 @@ const UserInput = () => {
                     <FormItem>
                       <FormLabel className="flex items-center">
                         <Text className="mr-2 h-4 w-4" />
-                        Short Bio (Optional)
+                        Short Bio
                       </FormLabel>
                       <FormControl>
                         <Textarea
@@ -494,7 +517,7 @@ const UserInput = () => {
                     <FormItem>
                       <FormLabel className="flex items-center">
                         <ImageIcon className="mr-2 h-4 w-4" />
-                        Project Image URL (Optional)
+                        Project Image URL (Opnal)
                       </FormLabel>
                       <FormControl>
                         <Input
