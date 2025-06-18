@@ -1,19 +1,18 @@
-import { Route, Routes } from 'react-router-dom'
-import HomePage from './pages/HomePage'
-import DetailsPage from './pages/DetailsPage'
-import Hero from './components/sections/HeroSection'
+import { Route, Routes } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import DetailsPage from "./pages/DetailsPage";
+import PortfolioPage from "./pages/PortfolioPage";
 
 function App() {
-
   return (
-    <div>
+    <div className="w-full">
       <Routes>
-        <Route path='/' element={<HomePage />} />
-        <Route path='/generate-your-portfolio' element={<DetailsPage />} />
-        <Route path='/hero' element={<Hero />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/generate-your-portfolio" element={<DetailsPage />} />
+        <Route path="/portfolio" element={<PortfolioPage />} />
       </Routes>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -19,12 +19,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { User, BookUser, Save, Briefcase, Text } from "lucide-react";
+import {
+  User,
+  BookUser,
+  Save,
+  Briefcase,
+  Text,
+  Cpu,
+  PlusCircle,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { Textarea } from "./ui/textarea";
 import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { usePortfolio } from "@/hooks/usePortfolio";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "./ui/badge";
 
 const profileSchema = z.object({
   name: z.string().min(2).max(50),
@@ -150,11 +160,11 @@ const UserInput = () => {
         // imageUrl: values.imageUrl,
         description: values.bio || "",
         socials: socials,
-      },  
+      },
     });
 
     setTimeout(() => {
-      navigate('/hero');
+      navigate("/hero");
     }, 100);
   };
 
@@ -171,12 +181,18 @@ const UserInput = () => {
   };
 
   const saveSkillsList = () => {
-    if (skillList.length === 0) {
-      console.warn("No skills to save.");
-      return;
-    }
-    // Here you can handle the saving logic, e.g., send to an API or store in local state
-    console.log("Skills saved:", skillList);
+    updatePortfolioConfig({
+      skills: [
+        ...portfolioConfig.skills,
+        ...skillList.map((skill) => ({ name: skill.skillName })),
+      ],
+    });
+
+    setTimeout(() => {
+      navigate("/portfolio");
+    }, 100);
+    // add to local storage
+    // console.log("Skills saved:", skillList);
   };
 
   const onAddProject = (values: Project) => {
@@ -390,7 +406,7 @@ const UserInput = () => {
         </Card>
 
         {/* skill section input */}
-        {/* <Card className="shadow-lg">
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center text-2xl">
               <Cpu className="mr-3 h-7 w-7 text-primary" /> Skills
@@ -455,7 +471,7 @@ const UserInput = () => {
               <Save className="mr-2 h-4 w-4" /> Save All Skills
             </Button>
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* project section input */}
         {/* <Card className="shadow-lg">
