@@ -1,56 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { DotBackground } from "../DotBackground";
-
-interface Experience {
-  company: string;
-  role: string;
-  startDate: string;
-  endDate: string;
-  responsibilities: string[];
-}
+import { usePortfolio } from "@/hooks/usePortfolio";
+import type { Experience } from "@/types/types";
 
 const Experience: React.FC = () => {
-  // Hardcoded experience data
-  const experienceData: Experience[] = [
-    {
-      company: "TechInnovate Inc.",
-      role: "Senior Frontend Developer",
-      startDate: "Jan 2023",
-      endDate: "Present",
-      responsibilities: [
-        "Led the development of a React-based dashboard that increased user engagement by 40%",
-        "Implemented performance optimizations resulting in a 30% improvement in load times",
-        "Mentored junior developers and conducted code reviews to ensure high quality standards",
-        "Collaborated with UX designers to create intuitive user interfaces and experiences",
-      ],
-    },
-    {
-      company: "WebSolutions Co.",
-      role: "Full Stack Developer",
-      startDate: "May 2020",
-      endDate: "Dec 2022",
-      responsibilities: [
-        "Developed and maintained multiple web applications using React, Node.js, and PostgreSQL",
-        "Implemented RESTful APIs that served data to over 10,000 daily active users",
-        "Integrated third-party services and APIs to enhance application functionality",
-        "Participated in agile development processes, contributing to sprint planning and retrospectives",
-      ],
-    },
-    {
-      company: "Digital Creations",
-      role: "Frontend Developer",
-      startDate: "Aug 2018",
-      endDate: "Apr 2020",
-      responsibilities: [
-        "Built responsive web interfaces using HTML5, CSS3, and JavaScript frameworks",
-        "Converted design mockups into functional web components",
-        "Optimized applications for maximum speed and scalability",
-        "Collaborated with cross-functional teams to define, design, and ship new features",
-      ],
-    },
-  ];
-  const [experience] = useState<Experience[]>(experienceData);
+  const { portfolioConfig } = usePortfolio();
+  const [experience, setExperience] = useState<Experience[]>([]);
+
+  useEffect(() => {
+    if (portfolioConfig.experience) {
+      setExperience(portfolioConfig.experience);
+    }
+  }, [portfolioConfig]);
+
   const isSmallScreen =
     typeof window !== "undefined"
       ? window.matchMedia("(max-width: 640px)").matches

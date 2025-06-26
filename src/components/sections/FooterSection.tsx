@@ -2,39 +2,20 @@ import { motion } from "framer-motion";
 import { Link } from "react-scroll";
 import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
+import { usePortfolio } from "@/hooks/usePortfolio";
+import { useEffect, useState } from "react";
+import { type PortfolioDetails } from "@/types/types";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { portfolioConfig } = usePortfolio();
+  const [ footerData, setFooterData ] = useState<typeof portfolioConfig.personal>()
 
-  // Hardcoded data
-  const personalData = {
-    name: "John Doe",
-    description:
-      "Full stack developer specializing in React, TypeScript, and modern web technologies. Creating beautiful and functional web applications.",
-    email: "john.doe@example.com",
-    socials: [
-      {
-        platform: "GitHub",
-        url: "https://github.com/johndoe",
-        icon: <FaGithub size={20} />,
-      },
-      {
-        platform: "LinkedIn",
-        url: "https://linkedin.com/in/johndoe",
-        icon: <FaLinkedin size={20} />,
-      },
-      {
-        platform: "Twitter",
-        url: "https://twitter.com/johndoe",
-        icon: <FaXTwitter size={20} />,
-      },
-      {
-        platform: "Email",
-        url: "mailto:john.doe@example.com",
-        icon: <MdEmail size={20} />,
-      },
-    ],
-  };
+  useEffect(() => {
+    if (portfolioConfig.personal) {
+      setFooterData(portfolioConfig.personal)
+    }
+  }, [portfolioConfig])
 
   const menuItems = [
     { title: "About Me", href: "hero" },
@@ -81,20 +62,11 @@ export const Footer = () => {
               whileHover={{ x: 2 }}
               className="font-display text-2xl font-semibold text-primary-900"
             >
-              {personalData.name}
+              {footerData?.name}
             </motion.h3>
             <p className="text-primary-600 max-w-md leading-relaxed">
-              {personalData.description}
+              {footerData?.description}
             </p>
-            <motion.div className="mt-4" whileHover={{ y: -2 }}>
-              <a
-                href={`mailto:${personalData.email}`}
-                className="inline-flex items-center px-4 py-2 rounded-md bg-primary-100 hover:bg-primary-200 text-primary-700 transition-colors duration-300"
-              >
-                <MdEmail className="mr-2" />
-                Contact Me
-              </a>
-            </motion.div>
           </motion.div>
 
           {/* Quick Links */}
@@ -123,7 +95,7 @@ export const Footer = () => {
               Connect
             </h4>
             <div className="flex space-x-4 items-center">
-              {personalData.socials.map((social) => (
+              {footerData?.socials?.map((social) => (
                 <motion.a
                   key={social.platform}
                   href={social.url}
@@ -134,7 +106,6 @@ export const Footer = () => {
                   whileHover={{ y: -4, scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  {social.icon}
                 </motion.a>
               ))}
             </div>
@@ -147,7 +118,7 @@ export const Footer = () => {
           className="mt-16 pt-6 -mb-10 border-t border-primary-200"
         >
           <p className="text-center text-primary-600">
-            © {currentYear} {personalData.name}. All rights reserved.
+            © {currentYear} {footerData?.name}. All rights reserved.
           </p>
         </motion.div>
       </div>

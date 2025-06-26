@@ -28,6 +28,14 @@ import {
   Cpu,
   PlusCircle,
   X,
+  ImageIcon,
+  FolderKanban,
+  Layers,
+  GitBranch,
+  Globe,
+  BriefcaseBusiness,
+  Building,
+  CalendarDays,
 } from "lucide-react";
 import { useState } from "react";
 import { Textarea } from "./ui/textarea";
@@ -65,10 +73,10 @@ const projectSchema = z.object({
   id: z.string().uuid(),
   projectTitle: z.string().min(1, "Project title is required"),
   projectDescription: z.string().min(1, "Project description is required"),
-  projectImageUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+  projectImageUrl: z.string().url("Invalid URL").or(z.literal("")),
   technologiesUsed: z.string().min(1, "Technologies used are required"),
   liveUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
-  gitUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+  gitUrl: z.string().url("Invalid URL").or(z.literal("")),
 });
 type Project = z.infer<typeof projectSchema>;
 
@@ -194,16 +202,14 @@ const UserInput = () => {
     // add to local storage
     // console.log("Skills saved:", skillList);
   };
-
+  const generateId = () => Math.random().toString(36).substring(2, 9);
   const onAddProject = (values: Project) => {
-    const generateId = () => Math.random().toString(36).substr(2, 9);
-    // Ensure the project has a unique ID
-    if (!values.id) {
-      values.id = generateId();
-    }
-    console.log(values);
-    setProjectList([...projectList, values]);
+    const newProject = { ...values, id: generateId() };
+    console.log("New Projects", newProject);
+
+    setProjectList([...projectList, newProject]);
     projectForm.reset();
+
     console.log("Current Projects List:", projectList);
   };
 
@@ -216,20 +222,34 @@ const UserInput = () => {
       console.warn("No projects to save.");
       return;
     }
+    updatePortfolioConfig({
+      projects: [
+        ...portfolioConfig.projects,
+        ...projectList.map((project) => ({
+          title: project.projectTitle,
+          description: project.projectDescription,
+          image: project.projectImageUrl || "",
+          tags: project.technologiesUsed.split(",").map((tag) => tag.trim()),
+          url: project.liveUrl || "",
+          github: project.gitUrl,
+        })),
+      ],
+    });
+    setTimeout(() => {
+      navigate("/portfolio");
+    }, 100);
     // Here you can handle the saving logic, e.g., send to an API or store in local state
     console.log("Projects saved:", projectList);
   };
 
-  const onAddExperience = () => {
-    const values = experienceForm.getValues();
-    // Ensure the experience has a unique ID
-    if (!values.id) {
-      values.id = crypto.randomUUID();
-    }
-    console.log(values);
-    setExperienceList([...experienceList, values]);
+  const onAddExperience = (values: Experience) => {
+    // create unique id for each experience
+    const newExperience = { ...values, id: generateId() };
+
+    // console.log("New Experience", newExperience);
+    setExperienceList([...experienceList, newExperience]);
     experienceForm.reset();
-    console.log("Current Experience List:", experienceList);
+    // console.log("Current Experience List:", experienceList);
   };
 
   const onRemoveExperience = (id: string) => {
@@ -241,7 +261,20 @@ const UserInput = () => {
       console.warn("No experience to save.");
       return;
     }
-    // Here you can handle the saving logic, e.g., send to an API or store in local state
+    updatePortfolioConfig({
+      experience: [
+        ...portfolioConfig.experience,
+        ...experienceList.map((experience) => ({
+          company: experience.company,
+          role: experience.position,
+          startDate: experience.startDate,
+          endDate: experience.endDate || "Present",
+          responsibilities: [experience.description],
+        })),
+      ],
+    });
+
+    // local me save krna hai
     console.log("Experience saved:", experienceList);
   };
 
@@ -474,7 +507,7 @@ const UserInput = () => {
         </Card>
 
         {/* project section input */}
-        {/* <Card className="shadow-lg">
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center text-2xl">
               <FolderKanban className="mr-3 h-7 w-7 text-primary" /> Projects
@@ -533,7 +566,7 @@ const UserInput = () => {
                     <FormItem>
                       <FormLabel className="flex items-center">
                         <ImageIcon className="mr-2 h-4 w-4" />
-                        Project Image URL (Opnal)
+                        Project Image URL
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -591,7 +624,7 @@ const UserInput = () => {
                       <FormItem>
                         <FormLabel className="flex items-center">
                           <GitBranch className="mr-2 h-4 w-4" />
-                          Git URL (Optional)
+                          Git URL
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -688,10 +721,10 @@ const UserInput = () => {
               <Save className="mr-2 h-4 w-4" /> Save All Projects
             </Button>
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* experience section input */}
-        {/* <Card className="shadow-lg">
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center text-2xl">
               <BriefcaseBusiness className="mr-3 h-7 w-7 text-primary" /> Work
@@ -859,7 +892,7 @@ const UserInput = () => {
               <Save className="mr-2 h-4 w-4" /> Save All Experience
             </Button>
           </CardContent>
-        </Card> */}
+        </Card>
       </div>
     </div>
   );

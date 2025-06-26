@@ -1,41 +1,27 @@
 import { motion } from "framer-motion";
 import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
-import { DotBackground } from "../DotBackground";
+import { usePortfolio } from "@/hooks/usePortfolio";
+import { useEffect, useState } from "react";
+import type { Project } from "@/types/types";
 
 const Projects = () => {
-  // Hardcoded projects data
-  const projects = [
+  const { portfolioConfig } = usePortfolio();
+  const [project, setProject] = useState<Project[]>([
     {
-      title: "E-Commerce Platform",
-      description:
-        "A modern e-commerce platform built with React, Node.js, and MongoDB. Features include user authentication, product search, cart management, and secure payment processing with Stripe.",
-      image:
-        "https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZWNvbW1lcmNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
-      tags: ["React", "Node.js", "MongoDB", "Express", "Stripe"],
-      github: "https://github.com/username/ecommerce-platform",
-      url: "https://ecommerce-demo.example.com",
+      title: "Loading...",
+      description: "Please wait while we load the projects.",
+      image: "/images/loading-placeholder.png",
+      tags: ["Loading"],
+      github: "",
+      url: "",
     },
-    {
-      title: "Task Management App",
-      description:
-        "A collaborative task management application with real-time updates using Socket.io. Users can create workspaces, assign tasks, set deadlines, and track progress with interactive charts.",
-      image:
-        "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHRhc2slMjBtYW5hZ2VtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
-      tags: ["React", "TypeScript", "Firebase", "Socket.io", "Chart.js"],
-      github: "https://github.com/username/task-management",
-      url: "https://task-app-demo.example.com",
-    },
-    {
-      title: "AI Image Generator",
-      description:
-        "An application that leverages OpenAI's DALL-E API to generate unique images from text prompts. Includes features for customization, history tracking, and image sharing.",
-      image:
-        "https://images.unsplash.com/photo-1675571309844-80e0bcadcd7c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8YWklMjBpbWFnZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
-      tags: ["React", "OpenAI API", "Node.js", "AWS S3", "Tailwind CSS"],
-      github: "https://github.com/username/ai-image-generator",
-      url: "https://ai-image-gen.example.com",
-    },
-  ];
+  ]);
+
+  useEffect(() => {
+    if (portfolioConfig.projects) {
+      setProject(portfolioConfig.projects);
+    }
+  }, [portfolioConfig]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -65,7 +51,6 @@ const Projects = () => {
       id={"projects"}
       className="min-h-screen py-24 bg-gradient-to-b from-primary-100 to-white relative overflow-hidden"
     >
-      <DotBackground glow={true} />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial="hidden"
@@ -81,7 +66,7 @@ const Projects = () => {
           </motion.h2>
 
           <div className="space-y-20">
-            {projects.map((project, index) => (
+            {project.map((project, index) => (
               <motion.div
                 key={index}
                 variants={projectVariants}
