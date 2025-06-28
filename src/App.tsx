@@ -8,7 +8,7 @@ function App() {
     <div className="w-full">
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/generate-your-portfolio" element={<DetailsPage />} />
+        <Route path="/generate-portfolio" element={<DetailsPage />} />
         <Route path="/portfolio" element={<PortfolioPage />} />
       </Routes>
     </div>

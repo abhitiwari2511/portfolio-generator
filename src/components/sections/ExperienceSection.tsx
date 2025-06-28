@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { DotBackground } from "../DotBackground";
 import { usePortfolio } from "@/hooks/usePortfolio";
 import type { Experience } from "@/types/types";
 
-const Experience: React.FC = () => {
+const ExperienceSection = () => {
   const { portfolioConfig } = usePortfolio();
   const [experience, setExperience] = useState<Experience[]>([]);
 
@@ -152,4 +152,4 @@ const Experience: React.FC = () => {
   );
 };
 
-export default Experience;
+export default ExperienceSection;

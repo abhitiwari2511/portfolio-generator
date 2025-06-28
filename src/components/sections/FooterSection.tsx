@@ -1,21 +1,11 @@
 import { motion } from "framer-motion";
 import { Link } from "react-scroll";
-import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
-import { MdEmail } from "react-icons/md";
+import { FaGithub, FaGlobe, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { usePortfolio } from "@/hooks/usePortfolio";
-import { useEffect, useState } from "react";
-import { type PortfolioDetails } from "@/types/types";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { portfolioConfig } = usePortfolio();
-  const [ footerData, setFooterData ] = useState<typeof portfolioConfig.personal>()
-
-  useEffect(() => {
-    if (portfolioConfig.personal) {
-      setFooterData(portfolioConfig.personal)
-    }
-  }, [portfolioConfig])
 
   const menuItems = [
     { title: "About Me", href: "hero" },
@@ -56,20 +46,20 @@ export const Footer = () => {
     >
       <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-          {/* Brand Section */}
+          {/* just user name */}
           <motion.div variants={itemVariants} className="space-y-6">
             <motion.h3
               whileHover={{ x: 2 }}
               className="font-display text-2xl font-semibold text-primary-900"
             >
-              {footerData?.name}
+              {portfolioConfig.personal.name}
             </motion.h3>
             <p className="text-primary-600 max-w-md leading-relaxed">
-              {footerData?.description}
+              {portfolioConfig.personal.description}
             </p>
           </motion.div>
 
-          {/* Quick Links */}
+          {/* quick Links */}
           <motion.div variants={itemVariants} className="space-y-6">
             <h4 className="font-title text-xl font-semibold text-primary-900">
               Quick Links
@@ -89,13 +79,13 @@ export const Footer = () => {
             </nav>
           </motion.div>
 
-          {/* Social Links */}
+          {/* social Links */}
           <motion.div variants={itemVariants} className="space-y-6">
             <h4 className="font-title text-xl font-semibold text-primary-900">
               Connect
             </h4>
             <div className="flex space-x-4 items-center">
-              {footerData?.socials?.map((social) => (
+              {portfolioConfig.personal.socials?.map((social) => (
                 <motion.a
                   key={social.platform}
                   href={social.url}
@@ -106,19 +96,32 @@ export const Footer = () => {
                   whileHover={{ y: -4, scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
+                  {social.platform.toLowerCase() === "github" && (
+                    <FaGithub size={20} />
+                  )}
+                  {social.platform.toLowerCase() === "linkedin" && (
+                    <FaLinkedin size={20} />
+                  )}
+                  {social.platform.toLowerCase() === "twitter" && (
+                    <FaXTwitter size={20} />
+                  )}
+                  {!["github", "linkedin", "twitter"].includes(
+                    social.platform.toLowerCase()
+                  ) && <FaGlobe size={20} />}
                 </motion.a>
               ))}
             </div>
           </motion.div>
         </div>
 
-        {/* Copyright */}
+        {/* copyright */}
         <motion.div
           variants={itemVariants}
           className="mt-16 pt-6 -mb-10 border-t border-primary-200"
         >
           <p className="text-center text-primary-600">
-            © {currentYear} {footerData?.name}. All rights reserved.
+            © {currentYear} {portfolioConfig.personal.name}. All rights
+            reserved.
           </p>
         </motion.div>
       </div>

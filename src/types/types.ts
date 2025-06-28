@@ -30,7 +30,7 @@ export interface PortfolioDetails {
     role: string;
     description: string;
     avatar?: string;
-    location: string;
+    location?: string;
     socials: Social[];
   };
   about: {

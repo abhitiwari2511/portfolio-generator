@@ -14,7 +14,7 @@ const HomePage = () => {
           Don't have a <ColourText value={"Portfolio"} /> <br /> Now it's easy
           to make for yourself !!
         </h1>
-        <Link className="mt-10" to="/generate-your-portfolio">
+        <Link className="mt-10" to="/generate-portfolio">
           <Button />
         </Link>
       </div>

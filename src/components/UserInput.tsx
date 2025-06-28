@@ -37,7 +37,7 @@ import {
   Building,
   CalendarDays,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Textarea } from "./ui/textarea";
 import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { usePortfolio } from "@/hooks/usePortfolio";
@@ -142,9 +142,42 @@ const UserInput = () => {
     },
   });
 
-  const onProfileSubmit = (values: Profile) => {
-    // console.log("Profile submitted:", values);
+  // saare data ko load krna initial reload pe
+  useEffect(() => {
+    try {
+      // load data
+      const savedProfile = localStorage.getItem("profile");
+      if (savedProfile) {
+        const profileData = JSON.parse(savedProfile);
+        // set data in form
+        Object.entries(profileData).forEach(([key, value]) => {
+          if (value && profileForm.getValues(key as keyof Profile) === "") {
+            profileForm.setValue(key as keyof Profile, value as string);
+          }
+        });
+      }
 
+      // ek ek krke sb data load krna
+      const savedSkills = localStorage.getItem("portfolio_skills");
+      if (savedSkills) {
+        setskillList(JSON.parse(savedSkills));
+      }
+
+      const savedProjects = localStorage.getItem("portfolio_projects");
+      if (savedProjects) {
+        setProjectList(JSON.parse(savedProjects));
+      }
+
+      const savedExperience = localStorage.getItem("portfolio_experience");
+      if (savedExperience) {
+        setExperienceList(JSON.parse(savedExperience));
+      }
+    } catch (error) {
+      console.error("Error loading saved data:", error);
+    }
+  }, []);
+
+  const onProfileSubmit = (values: Profile) => {
     const socials = [
       {
         platform: "LinkedIn",
@@ -158,63 +191,79 @@ const UserInput = () => {
         platform: "Twitter",
         url: values.twitterUrl || "",
       },
-    ];
+    ].filter((social) => social.url !== "");
 
+    // context update values se
     updatePortfolioConfig({
       personal: {
         ...portfolioConfig.personal,
         name: values.name,
         role: values.role,
-        // imageUrl: values.imageUrl,
         description: values.bio || "",
         socials: socials,
       },
     });
+    localStorage.setItem("profile", JSON.stringify(values));
 
-    setTimeout(() => {
-      navigate("/hero");
-    }, 100);
+    // reset after save
+    profileForm.reset();
   };
 
   const onAddSkill = (values: Skill) => {
-    // console.log(values);
-    setskillList([...skillList, values]);
-    console.log("Current Skills List:", skillList);
-    skillForm.reset(); // Reset the skill input after adding
+    const updatedSkillList = [...skillList, values];
+    setskillList(updatedSkillList);
+
+    // local me save
+    localStorage.setItem("portfolio_skills", JSON.stringify(updatedSkillList));
+    skillForm.reset();
   };
 
   const onRemoveSkill = (values: Skill) => {
-    // console.log(values);
-    setskillList(skillList.filter((skill) => skill !== values));
+    // skill ko remove krna filter krke
+    const updatedSkillList = skillList.filter((skill) => skill !== values);
+
+    setskillList(updatedSkillList);
+
+    localStorage.setItem("portfolio_skills", JSON.stringify(updatedSkillList));
   };
 
   const saveSkillsList = () => {
+    if (skillList.length === 0) {
+      console.warn("No skills to save.");
+      return;
+    }
+    localStorage.setItem("portfolio_skills", JSON.stringify(skillList));
     updatePortfolioConfig({
-      skills: [
-        ...portfolioConfig.skills,
-        ...skillList.map((skill) => ({ name: skill.skillName })),
-      ],
+      skills: skillList.map((skill: Skill) => ({ name: skill.skillName })),
     });
 
-    setTimeout(() => {
-      navigate("/portfolio");
-    }, 100);
-    // add to local storage
-    // console.log("Skills saved:", skillList);
+    setskillList([]);
   };
   const generateId = () => Math.random().toString(36).substring(2, 9);
   const onAddProject = (values: Project) => {
     const newProject = { ...values, id: generateId() };
-    console.log("New Projects", newProject);
+    const updatedProjectList = [...projectList, newProject];
+    setProjectList(updatedProjectList);
 
-    setProjectList([...projectList, newProject]);
+    // save in localStorage
+    localStorage.setItem(
+      "portfolio_projects",
+      JSON.stringify(updatedProjectList)
+    );
     projectForm.reset();
-
-    console.log("Current Projects List:", projectList);
   };
 
   const onRemoveProject = (id: string) => {
-    setProjectList(projectList.filter((project) => project.id !== id));
+    const updatedProjectList = projectList.filter(
+      (project) => project.id !== id
+    );
+
+    setProjectList(updatedProjectList);
+
+    localStorage.setItem(
+      "portfolio_projects",
+      JSON.stringify(updatedProjectList)
+    );
   };
 
   const saveProjectsList = () => {
@@ -222,38 +271,53 @@ const UserInput = () => {
       console.warn("No projects to save.");
       return;
     }
+
+    // Save to localStorage
+    localStorage.setItem("portfolio_projects", JSON.stringify(projectList));
+
+    // Update context directly data leke
     updatePortfolioConfig({
-      projects: [
-        ...portfolioConfig.projects,
-        ...projectList.map((project) => ({
-          title: project.projectTitle,
-          description: project.projectDescription,
-          image: project.projectImageUrl || "",
-          tags: project.technologiesUsed.split(",").map((tag) => tag.trim()),
-          url: project.liveUrl || "",
-          github: project.gitUrl,
-        })),
-      ],
+      projects: projectList.map((project: Project) => ({
+        title: project.projectTitle,
+        description: project.projectDescription,
+        image: project.projectImageUrl || "",
+        tags: project.technologiesUsed
+          .split(",")
+          .map((tag: string) => tag.trim()),
+        url: project.liveUrl || "",
+        github: project.gitUrl,
+      })),
     });
-    setTimeout(() => {
-      navigate("/portfolio");
-    }, 100);
-    // Here you can handle the saving logic, e.g., send to an API or store in local state
-    console.log("Projects saved:", projectList);
+
+    setProjectList([]);
   };
 
   const onAddExperience = (values: Experience) => {
     // create unique id for each experience
     const newExperience = { ...values, id: generateId() };
 
-    // console.log("New Experience", newExperience);
-    setExperienceList([...experienceList, newExperience]);
+    const updatedExperienceList = [...experienceList, newExperience];
+    setExperienceList(updatedExperienceList);
+
+    localStorage.setItem(
+      "portfolio_experience",
+      JSON.stringify(updatedExperienceList)
+    );
+
+    // reset form
     experienceForm.reset();
-    // console.log("Current Experience List:", experienceList);
   };
 
   const onRemoveExperience = (id: string) => {
-    setExperienceList(experienceList.filter((exp) => exp.id !== id));
+    // experience ko filter krke update krna state aur fir local me save
+    const updatedExperienceList = experienceList.filter((exp) => exp.id !== id);
+
+    setExperienceList(updatedExperienceList);
+
+    localStorage.setItem(
+      "portfolio_experience",
+      JSON.stringify(updatedExperienceList)
+    );
   };
 
   const saveExperienceList = () => {
@@ -261,21 +325,94 @@ const UserInput = () => {
       console.warn("No experience to save.");
       return;
     }
+    localStorage.setItem(
+      "portfolio_experience",
+      JSON.stringify(experienceList)
+    );
+
+    // context update
     updatePortfolioConfig({
-      experience: [
-        ...portfolioConfig.experience,
-        ...experienceList.map((experience) => ({
-          company: experience.company,
-          role: experience.position,
-          startDate: experience.startDate,
-          endDate: experience.endDate || "Present",
-          responsibilities: [experience.description],
-        })),
-      ],
+      experience: experienceList.map((exp) => ({
+        company: exp.company,
+        role: exp.position,
+        startDate: exp.startDate,
+        endDate: exp.endDate || "Present",
+        responsibilities: exp.description.split(",").map((item) => item.trim()),
+      })),
     });
 
-    // local me save krna hai
-    console.log("Experience saved:", experienceList);
+    setExperienceList([]);
+  };
+
+  const handleSubmit = () => {
+    try {
+      // data ko get krna hai local storage se
+      const profile = JSON.parse(localStorage.getItem("profile") || "{}");
+      const skills = JSON.parse(
+        localStorage.getItem("portfolio_skills") || "[]"
+      );
+      const projects = JSON.parse(
+        localStorage.getItem("portfolio_projects") || "[]"
+      );
+      const experience = JSON.parse(
+        localStorage.getItem("portfolio_experience") || "[]"
+      );
+
+      const socials = [
+        {
+          platform: "GitHub",
+          url: profile.githubUrl || "",
+        },
+        {
+          platform: "LinkedIn",
+          url: profile.linkedinUrl || "",
+        },
+        {
+          platform: "Twitter",
+          url: profile.twitterUrl || "",
+        },
+      ].filter((social) => social.url !== "");
+
+      // connfig bnana
+      const completeConfig = {
+        personal: {
+          name: profile.name || "",
+          role: profile.role || "",
+          description: profile.bio || "",
+          socials: socials,
+        },
+        skills: skills.map((skill: Skill) => ({ name: skill.skillName })),
+        projects: projects.map((project: Project) => ({
+          title: project.projectTitle,
+          description: project.projectDescription,
+          image: project.projectImageUrl || "",
+          tags: project.technologiesUsed
+            ? project.technologiesUsed
+                .split(",")
+                .map((tag: string) => tag.trim())
+            : [],
+          url: project.liveUrl || "",
+          github: project.gitUrl,
+        })),
+        experience: experience.map((exp: Experience) => ({
+          company: exp.company,
+          role: exp.position,
+          startDate: exp.startDate,
+          endDate: exp.endDate || "Present",
+          responsibilities: exp.description
+            ? exp.description.split(",").map((item) => item.trim())
+            : [],
+        })),
+      };
+      updatePortfolioConfig(completeConfig);
+
+      // Navigate to the portfolio page after saving and getting data
+      setTimeout(() => {
+        navigate("/portfolio");
+      }, 500);
+    } catch (error) {
+      console.error("Error submitting portfolio data:", error);
+    }
   };
 
   return (
@@ -893,6 +1030,14 @@ const UserInput = () => {
             </Button>
           </CardContent>
         </Card>
+
+        <Button
+          onClick={handleSubmit}
+          variant="outline"
+          className="w-full md:w-auto"
+        >
+          Generate Your Profile
+        </Button>
       </div>
     </div>
   );

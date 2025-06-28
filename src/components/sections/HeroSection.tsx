@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 const Hero = () => {
   const { portfolioConfig } = usePortfolio();
-  const [personal, setPersonal] = useState({
+  const [data, setData] = useState({
     name: "John Doe",
     title: "Full Stack Developer",
     description:
@@ -26,11 +26,13 @@ const Hero = () => {
         url: "https://twitter.com/johndoe",
       },
     ],
+    aboutTitle: "About Me",
+    aboutDescription:
+      "With over 5 years of experience in web development, I've worked on various projects from e-commerce platforms to enterprise applications. I'm constantly learning new technologies and techniques to improve my skills and deliver better products.",
   });
 
   useEffect(() => {
-    // console.log("Portfolio config updated in Hero:", portfolioConfig);
-    setPersonal({
+    setData({
       name: portfolioConfig.personal.name || "John Doe",
       title: portfolioConfig.personal.role || "Full Stack Developer",
       description:
@@ -41,33 +43,30 @@ const Hero = () => {
           platform: "github",
           url:
             portfolioConfig.personal.socials.find(
-              (s) => s.platform === "GitHub"
+              (s) => s.platform.toLowerCase() === "github"
             )?.url || "https://github.com/johndoe",
         },
         {
           platform: "linkedin",
           url:
             portfolioConfig.personal.socials.find(
-              (s) => s.platform === "LinkedIn"
+              (s) => s.platform.toLowerCase() === "linkedin"
             )?.url || "https://linkedin.com/in/johndoe",
         },
         {
           platform: "twitter",
           url:
             portfolioConfig.personal.socials.find(
-              (s) => s.platform === "Twitter"
+              (s) => s.platform.toLowerCase() === "twitter"
             )?.url || "https://twitter.com/johndoe",
         },
       ],
+      aboutTitle: "About Me",
+      aboutDescription:
+        portfolioConfig.personal?.description ||
+        "With over 5 years of experience in web development, I've worked on various projects from e-commerce platforms to enterprise applications. I'm constantly learning new technologies and techniques to improve my skills and deliver better products.",
     });
   }, [portfolioConfig]);
-
-  // Hardcoded about information
-  const about = {
-    title: "About Me",
-    description:
-      "With over 5 years of experience in web development, I've worked on various projects from e-commerce platforms to enterprise applications. I'm constantly learning new technologies and techniques to improve my skills and deliver better products.",
-  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -92,7 +91,7 @@ const Hero = () => {
   };
 
   return (
-    <div>
+    <div id="hero">
       <section className="min-h-screen bg-amber-300 flex items-center justify-center bg-gradient-to-b from-primary-100 to-white relative overflow-hidden px-4 sm:px-6 lg:px-8">
         <motion.div
           className="w-full pt-16 lg:pt-0 grid grid-cols-1 lg:grid-cols-2 max-w-7xl relative z-10 place-items-center"
@@ -105,21 +104,14 @@ const Hero = () => {
               className="hero-title text-5xl sm:text-6xl md:text-7xl lg:text-7xl mb-4 font-bold text-primary-900"
               variants={itemVariants}
             >
-              {personal.name}
+              {data.name}
             </motion.h1>
 
             <motion.p
               className="section-title text-xl sm:text-2xl text-primary-600 mb-6"
               variants={itemVariants}
             >
-              {personal.title}
-            </motion.p>
-
-            <motion.p
-              className="body-text text-base sm:text-lg text-primary-700 mb-8 max-w-2xl mx-auto sm:mx-0"
-              variants={itemVariants}
-            >
-              {personal.description}
+              {data.title}
             </motion.p>
 
             {/* social icons */}
@@ -127,7 +119,7 @@ const Hero = () => {
               className="flex justify-center sm:justify-start space-x-6 mb-8"
               variants={itemVariants}
             >
-              {personal.socials.map((social: Social) => (
+              {data.socials.map((social: Social) => (
                 <motion.div
                   key={social.platform}
                   className="group relative flex items-center justify-center rounded-full"
@@ -174,11 +166,11 @@ const Hero = () => {
               variants={itemVariants}
             >
               <h2 className="text-xl md:text-3xl font-bold font-title text-primary-900 mb-4">
-                {about.title}
+                {data.aboutTitle}
               </h2>
 
               <p className="text-primary-700 text-base leading-relaxed">
-                {about.description}
+                {data.aboutDescription}
               </p>
             </motion.div>
           </motion.div>
