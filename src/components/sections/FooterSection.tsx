@@ -55,7 +55,7 @@ export const Footer = () => {
               {portfolioConfig.personal.name}
             </motion.h3>
             <p className="text-primary-600 max-w-md leading-relaxed">
-              {portfolioConfig.personal.description}
+              {portfolioConfig.personal.role}
             </p>
           </motion.div>
 

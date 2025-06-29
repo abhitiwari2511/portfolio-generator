@@ -236,8 +236,6 @@ const UserInput = () => {
     updatePortfolioConfig({
       skills: skillList.map((skill: Skill) => ({ name: skill.skillName })),
     });
-
-    setskillList([]);
   };
   const generateId = () => Math.random().toString(36).substring(2, 9);
   const onAddProject = (values: Project) => {
@@ -288,8 +286,6 @@ const UserInput = () => {
         github: project.gitUrl,
       })),
     });
-
-    setProjectList([]);
   };
 
   const onAddExperience = (values: Experience) => {
@@ -340,8 +336,7 @@ const UserInput = () => {
         responsibilities: exp.description.split(",").map((item) => item.trim()),
       })),
     });
-
-    setExperienceList([]);
+    
   };
 
   const handleSubmit = () => {
@@ -409,6 +404,7 @@ const UserInput = () => {
       // Navigate to the portfolio page after saving and getting data
       setTimeout(() => {
         navigate("/portfolio");
+        window.scrollTo(0, 0);
       }, 500);
     } catch (error) {
       console.error("Error submitting portfolio data:", error);
@@ -416,7 +412,7 @@ const UserInput = () => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center w-full px-2 md:px-8 md:py-10 max-w-3xl mx-auto">
       <div className="space-y-8 -mt-4 p-10">
         {/* profile section input */}
         <Card className="shadow-lg">
@@ -1030,15 +1026,14 @@ const UserInput = () => {
             </Button>
           </CardContent>
         </Card>
-
-        <Button
-          onClick={handleSubmit}
-          variant="outline"
-          className="w-full md:w-auto"
-        >
-          Generate Your Profile
-        </Button>
       </div>
+      <Button
+        onClick={handleSubmit}
+        variant="outline"
+        className="w-full cursor-pointer md:w-auto"
+      >
+        Generate Your Profile
+      </Button>
     </div>
   );
 };
