@@ -15,7 +15,7 @@ const DetailsPage = () => {
         <h1 className="text-3xl text-center mt-6 space-y-2 md:text-4xl lg:text-5xl font-bold text-white">
           <ColourText value="User Details" />
         </h1>
-        <div className="w-full sm:w-[85%] md:w-[75%] lg:w-[60%] mt-6">
+        <div className="w-screen sm:w-[85%] md:w-[75%] lg:w-[60%] mt-4">
           {/* add form here */}
           <UserInput />
         </div>

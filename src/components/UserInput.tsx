@@ -207,6 +207,7 @@ const UserInput = () => {
 
     // reset after save
     profileForm.reset();
+    alert("Profile updated successfully!");
   };
 
   const onAddSkill = (values: Skill) => {
@@ -236,6 +237,7 @@ const UserInput = () => {
     updatePortfolioConfig({
       skills: skillList.map((skill: Skill) => ({ name: skill.skillName })),
     });
+    alert("Skills updated successfully!");
   };
   const generateId = () => Math.random().toString(36).substring(2, 9);
   const onAddProject = (values: Project) => {
@@ -286,6 +288,7 @@ const UserInput = () => {
         github: project.gitUrl,
       })),
     });
+    alert("Projects updated successfully!");
   };
 
   const onAddExperience = (values: Experience) => {
@@ -336,7 +339,7 @@ const UserInput = () => {
         responsibilities: exp.description.split(",").map((item) => item.trim()),
       })),
     });
-    
+    alert("Experience updated successfully!");
   };
 
   const handleSubmit = () => {
@@ -1027,6 +1030,7 @@ const UserInput = () => {
           </CardContent>
         </Card>
       </div>
+
       <Button
         onClick={handleSubmit}
         variant="outline"

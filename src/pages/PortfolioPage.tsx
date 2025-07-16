@@ -1,5 +1,6 @@
+import DownloadButton from "@/components/DownloadButton";
 import Experience from "@/components/sections/ExperienceSection";
-import { Footer } from "@/components/sections/FooterSection";
+import Footer from "@/components/sections/FooterSection";
 import Hero from "@/components/sections/HeroSection";
 import Projects from "@/components/sections/ProjectSection";
 import Skills from "@/components/sections/SkillSection";
@@ -23,7 +24,8 @@ const PortfolioPage = () => {
   }, [portfolioConfig, navigate]);
 
   return (
-    <div className="w-full mx-auto">
+    <div className="w-full mx-auto relative">
+      <DownloadButton />
       <Hero />
       <Projects />
       <Skills />

@@ -3,7 +3,7 @@ import { Link } from "react-scroll";
 import { FaGithub, FaGlobe, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { usePortfolio } from "@/hooks/usePortfolio";
 
-export const Footer = () => {
+const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { portfolioConfig } = usePortfolio();
 
@@ -128,3 +128,5 @@ export const Footer = () => {
     </motion.footer>
   );
 };
+
+export default Footer;
